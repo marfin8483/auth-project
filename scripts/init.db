@@ -1,0 +1,62 @@
+-- Create database
+CREATE DATABASE IF NOT EXISTS auth_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE auth_db;
+
+-- Create users table
+CREATE TABLE IF NOT EXISTS users (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'finance', 'customer') DEFAULT 'customer',
+    customer_id INT UNSIGNED NULL,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    is_verified BOOLEAN DEFAULT FALSE,
+    last_login TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_email (email),
+    INDEX idx_status (status),
+    INDEX idx_role (role),
+    INDEX idx_verified (is_verified)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insert sample admin user (password: Admin123!)
+INSERT INTO users (name, email, password, role, status, is_verified) 
+VALUES (
+    'Administrator', 
+    'admin@example.com', 
+    '$2a$10$N9qo8uLOickgx2ZMRZoMye0r8Q1Ql1pR5zW6K/2Z6YQ9r5FJbB5W6', -- Hash for 'Admin123!'
+    'admin', 
+    'active', 
+    TRUE
+) ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
+
+-- Insert sample finance user (password: Finance123!)
+INSERT INTO users (name, email, password, role, status, is_verified) 
+VALUES (
+    'Finance Officer', 
+    'finance@example.com', 
+    '$2a$10$N9qo8uLOickgx2ZMRZoMye0r8Q1Ql1pR5zW6K/2Z6YQ9r5FJbB5W6', -- Hash for 'Finance123!'
+    'finance', 
+    'active', 
+    TRUE
+) ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
+
+-- Insert sample customer user (password: Customer123!)
+INSERT INTO users (name, email, password, role, status, is_verified) 
+VALUES (
+    'John Doe', 
+    'customer@example.com', 
+    '$2a$10$N9qo8uLOickgx2ZMRZoMye0r8Q1Ql1pR5zW6K/2Z6YQ9r5FJbB5W6', -- Hash for 'Customer123!'
+    'customer', 
+    'active', 
+    FALSE
+) ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
+
+-- Show table structure
+DESCRIBE users;
+
+-- Show sample data
+SELECT id, name, email, role, status, is_verified, created_at FROM users;
